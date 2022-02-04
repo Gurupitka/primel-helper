@@ -40,33 +40,33 @@ namespace PrimeSearch
             var result = new SearchParams();
             var components = search.Split(" ");
             Predicate<string> positionalRequirements;
-            var positionAndValues = new List<Tuple<int,int>>();
+            var positionAndValues = new List<Tuple<int,string>>();
             for(int i = 0; i < components[0].Length; i++) {
                 //string could be * * 6 * * for example, meaning we should exclude strings which don't have 6 in position 2.
                 var letter = components[0][i];
                 if(letter != '*') {                    
-                    positionAndValues.Add(new Tuple<int,int>(i,letter));
+                    positionAndValues.Add(new Tuple<int,string>(i,letter.ToString()));
                 }
             }
             result.PositionalRequirements = (x => {
                 foreach(var val in positionAndValues) {                    
-                    if(x.Length < 5 || x[val.Item1] != val.Item2) {
+                    if(x.Length < 5 || x[val.Item1].ToString() != val.Item2) {
                         return false;
                     }                    
                 }
                 return true;
             });
 
-            var acceptableValues = new HashSet<int>();
+            var acceptableValues = new HashSet<string>();
             Predicate<string> containsAcceptableValues;
             if(components.Length > 1) {
                 //include
                 foreach(var val in components[1]) {
-                    acceptableValues.Add(val);
+                    acceptableValues.Add(val.ToString());
                 }
                 result.ContainsAcceptableValues = (x => {
                     foreach(var l in x) {
-                        if(!acceptableValues.Contains(l)){
+                        if(!acceptableValues.Contains(l.ToString())){
                             return false;
                         }
                     }
@@ -77,14 +77,14 @@ namespace PrimeSearch
             if(components.Length >2) {
                 //exclude these values.
                 Predicate<string> doesNotContainExcludedValues;
-                var unacceptableValues = new HashSet<int>();
+                var unacceptableValues = new HashSet<string>();
                 foreach(var val in components[2]) {
-                    unacceptableValues.Add(val);
+                    unacceptableValues.Add(val.ToString());
                 }
 
                 result.DoesNotContainExcludedValues = (x => {
                     foreach(var l in x) {
-                        if(unacceptableValues.Contains(l)){
+                        if(unacceptableValues.Contains(l.ToString())){
                             return false;
                         }
                     }
